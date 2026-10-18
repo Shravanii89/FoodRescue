@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#f8fafc] text-slate-800 font-sans;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Glassmorphism and modern gradient card styles */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.gradient-green-hero {
+  background: radial-gradient(100% 100% at 50% 0%, rgba(34, 197, 94, 0.12) 0%, rgba(248, 250, 252, 1) 100%);
+}
+
+.gradient-card-border {
+  position: relative;
+  border-radius: 1rem;
+}
+.gradient-card-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.4), rgba(255, 255, 255, 0.2), rgba(16, 185, 129, 0.2));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Badge and Status Colors */
+.badge-available {
+  @apply bg-emerald-50 text-emerald-700 border border-emerald-200/80;
+}
+.badge-claimed {
+  @apply bg-slate-100 text-slate-700 border border-slate-200;
+}
+.badge-urgent {
+  @apply bg-amber-50 text-amber-700 border border-amber-200/80;
+}
+.badge-critical {
+  @apply bg-rose-50 text-rose-700 border border-rose-200/80 animate-pulse;
+}
+
+/* Pulse animation utility */
+@keyframes subtlePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+.animate-subtle-pulse {
+  animation: subtlePulse 3s infinite ease-in-out;
+}

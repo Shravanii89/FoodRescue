@@ -1,0 +1,13 @@
+{
+  "name": "foodrescue-monorepo",
+  "version": "1.0.0",
+  "description": "FoodRescue - Smart Surplus Food Redistribution & Donation Management System",
+  "scripts": {
+    "install:all": "npm install --prefix server && npm install --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "seed": "npm run seed --prefix server",
+    "test": "npm run test --prefix server"
+  },
+  "keywords": ["food-rescue", "donation", "mongodb", "react", "express", "smart-match"]
+}
