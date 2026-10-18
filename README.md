@@ -147,12 +147,30 @@ For rapid demonstration during evaluation, use the credentials below or click **
    ```bash
    cd server
    npm test
-   # Runs 13 automated tests checking BSON models, atomic locks, geospatial queries, and seeds
+   # Runs live end-to-end workflow verification tests
    ```
 
 ---
 
-## 📱 7. Application Page Directory
+## 🚀 7. Production Deployment (Render, Vercel & MongoDB Atlas)
+
+Complete step-by-step production setup instructions are documented in [DEPLOYMENT.md](file:///c:/Users/adhav/OneDrive/Desktop/AD_Project/DEPLOYMENT.md).
+
+- **Database:** MongoDB Atlas (Cluster with `0.0.0.0/0` Network Access)
+- **Backend (Render):**
+  - Root Directory: `server`
+  - Build Command: `npm install`
+  - Start Command: `node index.js`
+  - Environment Variables: `MONGODB_URI`, `JWT_SECRET`, `CLIENT_URL`, `NODE_ENV=production`, `HOST=0.0.0.0`
+- **Frontend (Vercel):**
+  - Root Directory: `client`
+  - Build Command: `npm run build`
+  - Output Directory: `dist`
+  - Environment Variables: `VITE_API_URL=https://<your-render-backend>.onrender.com/api`
+
+---
+
+## 📱 8. Application Page Directory
 
 1. **Landing Page (`/`):** Food wastage crisis counters, solution workflow, live surplus feed, and impact metrics.
 2. **Login & Registration (`/login`, `/register`):** Role-based registration with GeoJSON coordinates and 1-click persona switchers.
@@ -172,7 +190,7 @@ For rapid demonstration during evaluation, use the credentials below or click **
 
 ---
 
-## 🏆 8. College Presentation Flow (Quick Demonstration Checklist)
+## 🏆 9. College Presentation Flow (Quick Demonstration Checklist)
 
 1. **Show Landing Page:** Highlight the problem, live impact statistics, and mission.
 2. **Use Demo Switcher:** Click **"Donor / Hotel"** in top navbar to log in as *Chef Rajesh Sharma*.

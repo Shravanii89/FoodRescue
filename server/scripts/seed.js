@@ -16,6 +16,12 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 export const seedDatabase = async () => {
+  if (process.env.NODE_ENV === 'production' && process.env.ALLOW_PRODUCTION_SEED !== 'true') {
+    console.warn('⚠️ Seeding blocked: Running destructive seed in production mode is disabled to protect live data.');
+    console.warn('ℹ️ To run seed against production, explicitly set ALLOW_PRODUCTION_SEED=true in environment.');
+    return;
+  }
+
   try {
     await connectDB();
     console.log('🌱 Starting FoodRescue database seeding...');

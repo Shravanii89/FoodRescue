@@ -23,6 +23,11 @@ export const connectDB = async () => {
   const uri = process.env.MONGODB_URI;
 
   if (!uri) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('❌ MONGODB_URI environment variable is not defined.');
+      console.error('👉 Please configure MONGODB_URI in your deployment settings (e.g. Render Dashboard > Environment).');
+      throw new Error('MONGODB_URI is required in production.');
+    }
     console.error('❌ MONGODB_URI is not set in server/.env environment variables.');
     console.log('ℹ️ Attempting in-memory MongoDB fallback for testing / demonstration...');
     try {
@@ -44,7 +49,7 @@ export const connectDB = async () => {
     console.log(`🔌 Attempting connection to ${isAtlas ? 'MongoDB Atlas Cluster' : 'Local MongoDB Service'}...`);
 
     const conn = await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 6000,
+      serverSelectionTimeoutMS: 8000,
       autoIndex: true
     });
     isConnected = true;
@@ -59,13 +64,18 @@ export const connectDB = async () => {
       console.error('      Please verify database users under MongoDB Atlas > Security > Database Access.');
     } else if (error.message?.includes('querySrv ETIMEOUT') || error.message?.includes('ETIMEDOUT') || error.message?.includes('Server selection timed out')) {
       console.error('   👉 Cause: Connection Timeout / Network Access Restriction.');
-      console.error('      Ensure your current IP address (or 0.0.0.0/0 for presentation) is allowed in MongoDB Atlas > Security > Network Access.');
+      console.error('      Ensure 0.0.0.0/0 (or your hosting IP) is allowed in MongoDB Atlas > Security > Network Access.');
     } else if (error.message?.includes('ECONNREFUSED')) {
-      console.error('   👉 Cause: Connection Refused. Local MongoDB service is not running at 127.0.0.1:27017.');
+      console.error('   👉 Cause: Connection Refused. MongoDB service is not reachable at the specified host.');
     } else if (error.message?.includes('Invalid scheme') || error.message?.includes('URI does not start with')) {
       console.error('   👉 Cause: Invalid URI format. Ensure MONGODB_URI begins with "mongodb://" or "mongodb+srv://".');
     } else {
       console.error(`   👉 Cause: ${error.name} - ${error.message}`);
+    }
+
+    if (process.env.NODE_ENV === 'production') {
+      console.error('\n❌ Production MongoDB connection failed. Terminating process to prevent running with missing storage.');
+      throw error;
     }
 
     console.log('\nℹ️ Falling back to in-memory MongoDB instance to ensure uninterrupted application availability...');

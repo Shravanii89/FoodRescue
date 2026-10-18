@@ -10,6 +10,7 @@ server/.env
 client/.env
 !.env.example
 !server/.env.example
+!client/.env.example
 
 # Build Artifacts
 dist/
