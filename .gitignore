@@ -1,8 +1,28 @@
+# Dependencies
 node_modules/
+*/node_modules/
+
+# Environment and Secrets
 .env
+.env*.local
+*.env
+server/.env
+client/.env
+!.env.example
+!server/.env.example
+
+# Build Artifacts
 dist/
 dist-ssr/
-*.local
+build/
+*/dist/
+
+# Logs and Diagnostics
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# System Files
 .DS_Store
 Thumbs.db
