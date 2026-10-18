@@ -80,15 +80,15 @@ const Navbar = ({ onToggleSidebar }) => {
           )}
 
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-700 to-emerald-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform">
-              <HeartHandshake className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-xl bg-forest flex items-center justify-center text-white shadow-md shadow-forest/20 group-hover:scale-105 transition-transform">
+              <HeartHandshake className="w-6 h-6 text-emerald-300" />
             </div>
             <div>
-              <span className="text-xl font-extrabold tracking-tight text-slate-900 group-hover:text-brand-700 transition-colors">
-                Food<span className="text-brand-600">Rescue</span>
+              <span className="text-xl font-black tracking-tight text-slate-900 group-hover:text-forest transition-colors">
+                Food<span className="text-forest-light">Rescue</span>
               </span>
-              <span className="hidden sm:inline-block ml-2 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-brand-100 text-brand-800">
-                AD System
+              <span className="hidden sm:inline-block ml-2 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded bg-forest/10 text-forest-light">
+                Redistribution
               </span>
             </div>
           </Link>
