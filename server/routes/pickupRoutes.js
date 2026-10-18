@@ -7,6 +7,46 @@ import { logAudit } from '../middleware/audit.js';
 
 const router = express.Router();
 
+// GET /api/pickups - Get all pickup records with pagination (Admin only)
+router.get('/', authenticate, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Admin access required.' });
+    }
+    const { status, page = 1, limit = 20 } = req.query;
+    const filter = {};
+    if (status) filter.status = status;
+
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+
+    const pickups = await PickupRecord.find(filter)
+      .populate('listingId')
+      .populate('recipientId', 'name organizationDetails phone location')
+      .populate('donorId', 'name organizationDetails phone location')
+      .populate('requestId')
+      .sort({ createdAt: -1 })
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum)
+      .lean();
+
+    const total = await PickupRecord.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: pickups,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        pages: Math.ceil(total / limitNum)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // GET /api/pickups/my - Get pickup records for logged in user (donor or recipient)
 router.get('/my', authenticate, async (req, res) => {
   try {

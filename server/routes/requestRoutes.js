@@ -121,6 +121,42 @@ router.post('/', authenticate, authorize('recipient', 'admin'), requireVerified,
   }
 });
 
+// GET /api/requests - Get all donation requests across platform (Admin only)
+router.get('/', authenticate, authorize('admin'), async (req, res) => {
+  try {
+    const { status, page = 1, limit = 20 } = req.query;
+    const filter = {};
+    if (status) filter.status = status;
+
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+
+    const requests = await DonationRequest.find(filter)
+      .populate('listingId')
+      .populate('donorId', 'name organizationDetails phone location')
+      .populate('recipientId', 'name organizationDetails phone location verificationStatus')
+      .sort({ createdAt: -1 })
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum)
+      .lean();
+
+    const total = await DonationRequest.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: requests,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        pages: Math.ceil(total / limitNum)
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // GET /api/requests/my - Get all requests for logged-in recipient
 router.get('/my', authenticate, authorize('recipient', 'admin'), async (req, res) => {
   try {

@@ -126,6 +126,15 @@ app.use((err, req, res, next) => {
 
 // Connect to Database and Start Server
 export const startServer = async () => {
+  // Start HTTP server immediately so port 5000 is open right away and Vite proxy won't get ECONNREFUSED
+  const server = app.listen(PORT, HOST, () => {
+    const displayHost = HOST === '0.0.0.0' ? 'localhost' : HOST;
+    console.log(`\n======================================================`);
+    console.log(`🚀 FoodRescue Server running on http://${displayHost}:${PORT}`);
+    console.log(`📡 Health Check: http://${displayHost}:${PORT}/api/health`);
+    console.log(`======================================================\n`);
+  });
+
   try {
     await connectDB();
     
@@ -138,16 +147,13 @@ export const startServer = async () => {
       await seedDatabase();
     }
 
-    const server = app.listen(PORT, HOST, () => {
-      console.log(`\n======================================================`);
-      console.log(`🚀 FoodRescue Server running on http://${HOST}:${PORT}`);
-      console.log(`📡 Health Check: http://${HOST}:${PORT}/api/health`);
-      console.log(`======================================================\n`);
-    });
     return server;
   } catch (error) {
-    console.error('Failed to start server:', error.message);
-    process.exit(1);
+    console.error('Failed to initialize database during startup:', error.message);
+    if (process.env.NODE_ENV === 'production') {
+      process.exit(1);
+    }
+    return server;
   }
 };
 

@@ -95,6 +95,22 @@ router.get('/users', async (req, res) => {
   }
 });
 
+// GET /api/admin/pending-ngos - Convenience endpoint for NGOs awaiting verification
+router.get('/pending-ngos', async (req, res) => {
+  try {
+    const pending = await User.find({ verificationStatus: 'pending' })
+      .sort({ createdAt: -1 })
+      .lean();
+    res.json({
+      success: true,
+      count: pending.length,
+      data: pending
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // PUT /api/admin/users/:id/verify - Verify or reject an NGO/donor
 router.put('/users/:id/verify', async (req, res) => {
   try {
