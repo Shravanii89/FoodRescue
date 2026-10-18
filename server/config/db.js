@@ -1,60 +1,84 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-dotenv.config();
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Explicitly load server/.env regardless of current working directory
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 let isConnected = false;
 
+/**
+ * Connect to MongoDB using MONGODB_URI from server/.env
+ * Provides safe diagnostic logging without exposing passwords or secret tokens.
+ */
 export const connectDB = async () => {
-  if (isConnected) {
+  if (isConnected && mongoose.connection.readyState === 1) {
     return mongoose.connection;
   }
 
   const uri = process.env.MONGODB_URI;
 
   if (!uri) {
-    console.error('❌ MONGODB_URI is not set in environment variables.');
+    console.error('❌ MONGODB_URI is not set in server/.env environment variables.');
     console.log('ℹ️ Attempting in-memory MongoDB fallback for testing / demonstration...');
     try {
       const { MongoMemoryServer } = await import('mongodb-memory-server');
       const mongod = await MongoMemoryServer.create();
       const memoryUri = mongod.getUri();
-      console.log(`🚀 In-memory MongoDB started at: ${memoryUri}`);
       const conn = await mongoose.connect(memoryUri);
       isConnected = true;
-      console.log('✅ Connected to MongoDB (In-Memory Full Binary Server for Demo)');
+      console.log('✅ Connected to MongoDB (In-Memory Full Binary Instance for Demo)');
       return conn;
     } catch (memErr) {
       console.error('❌ Could not start in-memory MongoDB either:', memErr.message);
-      throw new Error('MongoDB connection failed. Please provide a valid MONGODB_URI in server/.env');
+      throw new Error('MongoDB connection failed. Please ensure MONGODB_URI is configured in server/.env');
     }
   }
 
   try {
+    const isAtlas = uri.startsWith('mongodb+srv://') || uri.includes('.mongodb.net');
+    console.log(`🔌 Attempting connection to ${isAtlas ? 'MongoDB Atlas Cluster' : 'Local MongoDB Service'}...`);
+
     const conn = await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 6000,
       autoIndex: true
     });
     isConnected = true;
-    console.log(`✅ Connected to MongoDB: ${conn.connection.host}/${conn.connection.name}`);
+    console.log(`✅ Successfully connected to MongoDB: ${conn.connection.host} (Database: ${conn.connection.name})`);
     return conn;
   } catch (error) {
-    console.warn(`⚠️ Primary MongoDB connection failed (${error.message}).`);
-    console.log('ℹ️ Attempting in-memory MongoDB fallback so you can demonstrate the project without local mongod setup...');
+    // Diagnostic error analysis without leaking credentials or raw URI
+    console.warn(`\n⚠️ Primary MongoDB connection attempt encountered an issue:`);
+    
+    if (error.message?.includes('bad auth') || error.code === 8000 || error.message?.includes('Authentication failed')) {
+      console.error('   👉 Cause: Authentication Failed. The database username or password in MONGODB_URI is incorrect or has expired.');
+      console.error('      Please verify database users under MongoDB Atlas > Security > Database Access.');
+    } else if (error.message?.includes('querySrv ETIMEOUT') || error.message?.includes('ETIMEDOUT') || error.message?.includes('Server selection timed out')) {
+      console.error('   👉 Cause: Connection Timeout / Network Access Restriction.');
+      console.error('      Ensure your current IP address (or 0.0.0.0/0 for presentation) is allowed in MongoDB Atlas > Security > Network Access.');
+    } else if (error.message?.includes('ECONNREFUSED')) {
+      console.error('   👉 Cause: Connection Refused. Local MongoDB service is not running at 127.0.0.1:27017.');
+    } else if (error.message?.includes('Invalid scheme') || error.message?.includes('URI does not start with')) {
+      console.error('   👉 Cause: Invalid URI format. Ensure MONGODB_URI begins with "mongodb://" or "mongodb+srv://".');
+    } else {
+      console.error(`   👉 Cause: ${error.name} - ${error.message}`);
+    }
+
+    console.log('\nℹ️ Falling back to in-memory MongoDB instance to ensure uninterrupted application availability...');
     try {
       const { MongoMemoryServer } = await import('mongodb-memory-server');
       const mongod = await MongoMemoryServer.create();
       const memoryUri = mongod.getUri();
-      console.log(`🚀 In-memory MongoDB instance started at: ${memoryUri}`);
-      const conn = await mongoose.connect(memoryUri, {
-        autoIndex: true
-      });
+      const conn = await mongoose.connect(memoryUri, { autoIndex: true });
       isConnected = true;
-      console.log('✅ Connected to MongoDB (Full MongoDB Binary in-memory mode for Demo)');
+      console.log(`✅ Connected to MongoDB (In-Memory Full Binary Server fallback on host: ${conn.connection.host})`);
       return conn;
     } catch (memErr) {
       console.error('❌ In-memory MongoDB fallback also failed:', memErr.message);
-      console.error('👉 Please configure a valid MongoDB Atlas connection string in server/.env:');
-      console.error('   MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.abcde.mongodb.net/foodrescue');
       throw error;
     }
   }
