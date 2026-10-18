@@ -11,11 +11,13 @@ import {
   MapPin,
   ArrowRight,
   AlertCircle,
-  CheckCircle2
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 const RegisterPage = () => {
   const [role, setRole] = useState('donor');
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -188,15 +190,23 @@ const RegisterPage = () => {
                 <div className="relative">
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     required
                     minLength={6}
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Min 6 characters"
-                    className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-500 outline-hidden"
+                    className="w-full pl-9 pr-10 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-forest/20 focus:border-forest outline-none"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 transition-colors"
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
@@ -357,7 +367,7 @@ const RegisterPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md shadow-brand-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full py-3 px-4 rounded-xl bg-forest hover:bg-forest-light text-white font-bold text-xs shadow-md shadow-forest/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {loading ? (
               <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -373,7 +383,7 @@ const RegisterPage = () => {
         <div className="mt-6 pt-4 border-t border-slate-100 text-center">
           <p className="text-xs text-slate-500">
             Already registered?{' '}
-            <Link to="/login" className="font-bold text-brand-600 hover:text-brand-700">
+            <Link to="/login" className="font-bold text-forest hover:text-forest-light">
               Sign In
             </Link>
           </p>

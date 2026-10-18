@@ -2,17 +2,12 @@ import React, { useState } from 'react';
 import apiClient from '../api/apiClient';
 import { useAuth } from '../context/AuthContext';
 import {
-  User,
-  Building2,
-  Phone,
-  Mail,
-  MapPin,
-  ShieldCheck,
   CheckCircle2,
   AlertCircle,
   Bell,
   Save
 } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
 
 const ProfilePage = () => {
   const { user, updateUser, notifications, markNotificationRead, markAllNotificationsRead } = useAuth();
@@ -77,26 +72,23 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-4 space-y-6">
-      <div>
-        <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
-          <User className="w-6 h-6 text-brand-600" />
-          <span>Profile & Organization Settings</span>
-        </h1>
-        <p className="text-xs text-slate-500 mt-0.5">
-          Manage your contact information, geospatial coordinates, and review system notices
-        </p>
-      </div>
+    <div className="max-w-4xl mx-auto py-2 space-y-6">
+      <PageHeader
+        title={user?.role === 'donor' ? 'Donor Profile & Kitchen Setup' : user?.role === 'recipient' ? 'Organization Profile & Capacity' : 'Administrator Profile'}
+        subtitle="Manage your contact details, operational capacity, geospatial coordinates for smart matching, and alerts."
+        badge={`${user?.role?.toUpperCase()} ACCOUNT`}
+        badgeVariant={user?.role === 'admin' ? 'neutral' : 'success'}
+      />
 
       {successMsg && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-semibold text-emerald-800 flex items-center gap-2 animate-fadeIn">
+        <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-semibold text-emerald-800 flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>{successMsg}</span>
         </div>
       )}
 
       {errorMsg && (
-        <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-semibold text-rose-800 flex items-center gap-2 animate-fadeIn">
+        <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-semibold text-rose-800 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
           <span>{errorMsg}</span>
         </div>
@@ -104,7 +96,7 @@ const ProfilePage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Left: Edit Form */}
-        <div className="lg:col-span-2 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-card">
+        <div className="lg:col-span-2 bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-xs">
           <form onSubmit={handleSave} className="space-y-6">
             <div>
               <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
@@ -119,7 +111,7 @@ const ProfilePage = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-500 outline-hidden font-medium"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-forest outline-hidden font-medium"
                   />
                 </div>
 
@@ -129,7 +121,7 @@ const ProfilePage = () => {
                     type="email"
                     disabled
                     value={user?.email || ''}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-slate-50 text-slate-500 cursor-not-allowed"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-slate-50 text-slate-500 cursor-not-allowed font-medium"
                   />
                 </div>
 
@@ -140,7 +132,7 @@ const ProfilePage = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-500 outline-hidden"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-forest outline-hidden font-medium"
                   />
                 </div>
 
@@ -151,7 +143,7 @@ const ProfilePage = () => {
                     name="orgName"
                     value={formData.orgName}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-500 outline-hidden font-medium"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-forest outline-hidden font-medium"
                   />
                 </div>
 
@@ -162,7 +154,7 @@ const ProfilePage = () => {
                     name="registrationNumber"
                     value={formData.registrationNumber}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-500 outline-hidden"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-forest outline-hidden font-medium"
                   />
                 </div>
 
@@ -174,7 +166,7 @@ const ProfilePage = () => {
                     name="capacityDailyMeals"
                     value={formData.capacityDailyMeals}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-500 outline-hidden"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-forest outline-hidden font-medium"
                   />
                 </div>
               </div>
@@ -193,7 +185,7 @@ const ProfilePage = () => {
                     name="address"
                     value={formData.address}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-500 outline-hidden"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-forest outline-hidden font-medium"
                   />
                 </div>
 
@@ -205,7 +197,7 @@ const ProfilePage = () => {
                       name="city"
                       value={formData.city}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-500 outline-hidden"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-forest outline-hidden font-medium"
                     />
                   </div>
                   <div>
@@ -216,7 +208,7 @@ const ProfilePage = () => {
                       name="lat"
                       value={formData.lat}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-500 outline-hidden font-mono"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-forest outline-hidden font-mono"
                     />
                   </div>
                   <div>
@@ -227,7 +219,7 @@ const ProfilePage = () => {
                       name="lng"
                       value={formData.lng}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-500 outline-hidden font-mono"
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-forest outline-hidden font-mono"
                     />
                   </div>
                 </div>
@@ -238,14 +230,14 @@ const ProfilePage = () => {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md shadow-brand-500/20 transition-all flex items-center gap-2 disabled:opacity-50"
+                className="px-6 py-2.5 rounded-xl bg-forest hover:bg-forest-light text-white font-bold text-xs shadow-xs transition-colors flex items-center gap-2 disabled:opacity-50"
               >
                 {saving ? (
                   <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
                   <>
                     <Save className="w-4 h-4" />
-                    <span>Save Changes</span>
+                    <span>Save Profile Changes</span>
                   </>
                 )}
               </button>
@@ -254,16 +246,16 @@ const ProfilePage = () => {
         </div>
 
         {/* Right: Notifications History */}
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+        <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-              <Bell className="w-4 h-4 text-brand-600" />
+              <Bell className="w-4 h-4 text-forest" />
               <span>Notifications Log</span>
             </h3>
             {notifications.length > 0 && (
               <button
                 onClick={markAllNotificationsRead}
-                className="text-[11px] font-semibold text-brand-600 hover:text-brand-700"
+                className="text-[11px] font-semibold text-forest hover:underline"
               >
                 Clear Unread
               </button>
@@ -278,12 +270,12 @@ const ProfilePage = () => {
                 <div
                   key={n._id}
                   onClick={() => !n.isRead && markNotificationRead(n._id)}
-                  className={`p-3 rounded-2xl border text-xs cursor-pointer transition-all ${
-                    n.isRead ? 'bg-slate-50 border-slate-100 text-slate-600' : 'bg-emerald-50/70 border-emerald-200 text-slate-900 font-medium'
+                  className={`p-3 rounded-xl border text-xs cursor-pointer transition-all ${
+                    n.isRead ? 'bg-slate-50 border-slate-100 text-slate-600' : 'bg-forest/5 border-forest/20 text-slate-900 font-medium'
                   }`}
                 >
                   <p className="font-bold text-slate-900">{n.title}</p>
-                  <p className="mt-0.5 text-slate-600">{n.message}</p>
+                  <p className="mt-0.5 text-slate-600 leading-relaxed">{n.message}</p>
                   <span className="text-[10px] text-slate-400 mt-1 block">
                     {new Date(n.createdAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
                   </span>
