@@ -5,40 +5,45 @@ import { useAuth } from '../context/AuthContext';
 import {
   HeartHandshake,
   Sparkles,
-  Compass,
   Truck,
   Inbox,
   CheckCircle2,
-  Clock,
-  MapPin,
-  ShieldAlert,
+  AlertCircle,
+  Compass,
   ArrowRight,
-  ShieldCheck,
-  AlertCircle
+  Clock,
+  Building2,
+  Key
 } from 'lucide-react';
 import StatCard from '../components/StatCard';
 import StatusBadge from '../components/StatusBadge';
 import ExpiryBadge from '../components/ExpiryBadge';
+import EmptyState from '../components/EmptyState';
 
 const RecipientDashboard = () => {
   const { user } = useAuth();
   const [requests, setRequests] = useState([]);
   const [pickups, setPickups] = useState([]);
   const [matches, setMatches] = useState([]);
+  const [availableCount, setAvailableCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [requestsRes, pickupsRes, matchRes] = await Promise.all([
+      const [requestsRes, pickupsRes, matchRes, listingsRes] = await Promise.all([
         apiClient.get('/requests/my'),
         apiClient.get('/pickups/my'),
-        apiClient.get('/match/recommendations?limit=3')
+        apiClient.get('/match/recommendations?limit=3'),
+        apiClient.get('/listings?limit=1')
       ]);
 
       if (requestsRes.data?.data) setRequests(requestsRes.data.data);
       if (pickupsRes.data?.data) setPickups(pickupsRes.data.data);
       if (matchRes.data?.data) setMatches(matchRes.data.data.slice(0, 3));
+      if (listingsRes.data?.pagination?.total !== undefined) {
+        setAvailableCount(listingsRes.data.pagination.total);
+      }
     } catch (err) {
       console.error('Failed to load recipient dashboard:', err);
     } finally {
@@ -52,27 +57,39 @@ const RecipientDashboard = () => {
 
   const pendingCount = requests.filter((r) => r.status === 'pending').length;
   const approvedCount = requests.filter((r) => r.status === 'approved').length;
+  const scheduledPickupsCount = pickups.filter((p) => p.status === 'scheduled').length;
+  const completedPickupsCount = pickups.filter((p) => p.status === 'completed').length;
   const totalMealsClaimed = requests
     .filter((r) => r.status === 'completed' || r.status === 'approved')
     .reduce((acc, r) => acc + r.requestedQuantity, 0);
-  const totalPeopleFed = requests
-    .filter((r) => r.status === 'completed' || r.status === 'approved')
-    .reduce((acc, r) => acc + (r.peopleToFeed || 0), 0);
 
   const isVerified = user?.verificationStatus === 'verified';
 
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
+        <div className="w-10 h-10 border-4 border-forest border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-semibold text-slate-500">Loading recipient food rescue portal...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Top Banner */}
       <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-              isVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
-            }`}>
+            <span
+              className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                isVerified
+                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                  : 'bg-amber-50 text-amber-800 border border-amber-200'
+              }`}
+            >
               {isVerified ? 'Verified Community NGO' : 'Verification In Review'}
             </span>
-            <span className="text-xs text-slate-400 capitalize">• {user?.organizationDetails?.orgType}</span>
+            <span className="text-xs text-slate-400 capitalize">• {user?.organizationDetails?.orgType || 'Charity'}</span>
           </div>
 
           <h1 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">
@@ -84,19 +101,20 @@ const RecipientDashboard = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Link
-            to="/smart-match"
-            className="px-4 py-2.5 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md shadow-brand-500/20 transition-all flex items-center gap-2 shrink-0"
-          >
-            <Sparkles className="w-4 h-4 text-emerald-200" />
-            <span>AI Smart Match</span>
-          </Link>
+        <div className="flex items-center gap-2.5">
           <Link
             to="/explore"
-            className="px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-colors shrink-0"
+            className="px-4 py-2.5 rounded-2xl bg-forest hover:bg-forest-light text-white font-bold text-xs shadow-md shadow-forest/20 transition-all flex items-center gap-2 shrink-0"
           >
-            Browse Surplus
+            <Compass className="w-4 h-4 text-emerald-300" />
+            <span>Find Food</span>
+          </Link>
+          <Link
+            to="/smart-match"
+            className="px-4 py-2.5 rounded-2xl bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs transition-colors shrink-0 flex items-center gap-1.5"
+          >
+            <Sparkles className="w-4 h-4 text-teal-600" />
+            <span>Smart Match</span>
           </Link>
         </div>
       </div>
@@ -106,42 +124,49 @@ const RecipientDashboard = () => {
           <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div>
             <p className="font-bold">Identity Verification Pending</p>
-            <p className="mt-0.5 text-amber-800">
-              Your charitable organization is currently queued for administrator approval. You can view food batches and Smart Match scores in read-only mode until verified.
+            <p className="mt-0.5 text-amber-800 leading-relaxed">
+              Your charitable organization is currently queued for administrator approval. You can browse food listings and view Smart Match recommendations; claim requests will be enabled immediately upon administrative verification.
             </p>
           </div>
         </div>
       )}
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
         <StatCard
-          title="Meals Secured"
-          value={totalMealsClaimed}
-          subtitle="Approved or completed"
-          icon={HeartHandshake}
+          title="Available Food"
+          value={availableCount}
+          subtitle="Batches nearby"
+          icon={Compass}
           color="emerald"
         />
         <StatCard
-          title="People Nourished"
-          value={totalPeopleFed}
-          subtitle="Estimated individuals"
-          icon={CheckCircle2}
-          color="blue"
-        />
-        <StatCard
-          title="Active Claims"
-          value={pendingCount + approvedCount}
-          subtitle={`${pendingCount} pending donor review`}
+          title="Active Requests"
+          value={pendingCount}
+          subtitle="Pending donor review"
           icon={Inbox}
           color="amber"
         />
         <StatCard
-          title="Scheduled Pickups"
-          value={pickups.filter((p) => p.status === 'scheduled').length}
+          title="Approved Claims"
+          value={approvedCount}
           subtitle="Ready for transport"
+          icon={CheckCircle2}
+          color="blue"
+        />
+        <StatCard
+          title="Upcoming Pickups"
+          value={scheduledPickupsCount}
+          subtitle="Scheduled window"
           icon={Truck}
           color="purple"
+        />
+        <StatCard
+          title="Completed Rescues"
+          value={completedPickupsCount}
+          subtitle={`${totalMealsClaimed} meals received`}
+          icon={HeartHandshake}
+          color="emerald"
         />
       </div>
 
@@ -150,49 +175,59 @@ const RecipientDashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-brand-600" />
+              <Sparkles className="w-4 h-4 text-forest" />
               <span>Recommended Surplus for Your Center</span>
             </h2>
-            <p className="text-xs text-slate-500">Scored by proximity, quantity demand, and expiry safety</p>
+            <p className="text-xs text-slate-500">Deterministically ranked by distance, capacity match, and expiry safety</p>
           </div>
-          <Link to="/smart-match" className="text-xs font-bold text-brand-600 hover:text-brand-700 flex items-center gap-1">
+          <Link to="/smart-match" className="text-xs font-bold text-forest hover:text-forest-light flex items-center gap-1">
             <span>View All Matches</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {matches.map((item) => (
-            <div
-              key={item._id}
-              className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-50 text-brand-800">
-                    {item.matchScore}% Match
-                  </span>
-                  <ExpiryBadge expiryTime={item.expiryTime} />
-                </div>
-
-                <h3 className="font-bold text-slate-900 text-sm line-clamp-1">{item.title}</h3>
-                <p className="text-xs text-slate-500 mt-1 line-clamp-2">{item.matchExplanation}</p>
-
-                <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
-                  <span>Available:</span>
-                  <span className="font-bold text-brand-700">{item.remainingQuantity} {item.unit}</span>
-                </div>
-              </div>
-
-              <Link
-                to={`/listings/${item._id}`}
-                className="mt-4 w-full py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs text-center transition-colors"
+        {matches.length === 0 ? (
+          <EmptyState
+            icon={Sparkles}
+            title="No recommended batches right now"
+            description="As donors in your vicinity post surplus food matching your meal capacity, compatible recommendations will appear here."
+            actionLabel="Browse Available Food"
+            actionTo="/explore"
+          />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {matches.map((item) => (
+              <div
+                key={item._id}
+                className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
               >
-                Claim Batch
-              </Link>
-            </div>
-          ))}
-        </div>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-forest/10 text-forest-light">
+                      {item.matchScore}% Match
+                    </span>
+                    <ExpiryBadge expiryTime={item.expiryTime} />
+                  </div>
+
+                  <h3 className="font-bold text-slate-900 text-sm line-clamp-1">{item.title}</h3>
+                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">{item.matchExplanation}</p>
+
+                  <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                    <span>Available:</span>
+                    <span className="font-bold text-forest">{item.remainingQuantity} {item.unit}</span>
+                  </div>
+                </div>
+
+                <Link
+                  to={`/listings/${item._id}`}
+                  className="mt-4 w-full py-2 px-3 rounded-xl bg-forest hover:bg-forest-light text-white font-bold text-xs text-center transition-colors shadow-xs"
+                >
+                  Claim Batch
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Recent Claim Requests Tracking */}
@@ -200,40 +235,36 @@ const RecipientDashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base font-bold text-slate-900">My Donation Claims & Requests</h2>
-            <p className="text-xs text-slate-500">Status of your food requests submitted to local kitchens</p>
+            <p className="text-xs text-slate-500">Live status of claims submitted to donor kitchens</p>
           </div>
-          <Link to="/requests" className="text-xs font-bold text-brand-600 hover:text-brand-700">
-            View All
+          <Link to="/recipient/requests" className="text-xs font-bold text-forest hover:text-forest-light flex items-center gap-1">
+            <span>View All ({requests.length})</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
         {requests.length === 0 ? (
-          <div className="py-10 text-center">
-            <Inbox className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-            <p className="text-xs font-bold text-slate-600">No donation requests made yet.</p>
-            <p className="text-[11px] text-slate-400 mt-1">Browse available surplus food to submit claims for your shelter.</p>
-            <Link
-              to="/explore"
-              className="inline-block mt-3 px-4 py-2 rounded-xl bg-brand-600 text-white font-bold text-xs"
-            >
-              Explore Available Food
-            </Link>
-          </div>
+          <EmptyState
+            icon={Inbox}
+            title="No donation claims submitted yet"
+            description="Explore available surplus food nearby and submit requests for your community kitchen or shelter."
+            actionLabel="Discover Food"
+            actionTo="/explore"
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-600">
-              <thead className="bg-slate-50 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
+              <thead className="bg-slate-50/80 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
                 <tr>
                   <th className="py-3 px-3">Surplus Food</th>
                   <th className="py-3 px-3">Donor Kitchen</th>
                   <th className="py-3 px-3">Claim Quantity</th>
-                  <th className="py-3 px-3">People Fed</th>
                   <th className="py-3 px-3">Status</th>
                   <th className="py-3 px-3 text-right">Logistics</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {requests.slice(0, 6).map((req) => (
+                {requests.slice(0, 5).map((req) => (
                   <tr key={req._id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="py-3 px-3">
                       <p className="font-bold text-slate-900">{req.listingId?.title}</p>
@@ -242,11 +273,8 @@ const RecipientDashboard = () => {
                     <td className="py-3 px-3 font-medium text-slate-800">
                       {req.donorId?.organizationDetails?.orgName || req.donorId?.name}
                     </td>
-                    <td className="py-3 px-3 font-bold text-brand-700">
+                    <td className="py-3 px-3 font-bold text-forest">
                       {req.requestedQuantity} {req.unit}
-                    </td>
-                    <td className="py-3 px-3 text-emerald-700 font-semibold">
-                      ~{req.peopleToFeed} people
                     </td>
                     <td className="py-3 px-3">
                       <StatusBadge status={req.status} />
@@ -254,10 +282,11 @@ const RecipientDashboard = () => {
                     <td className="py-3 px-3 text-right">
                       {req.status === 'approved' ? (
                         <Link
-                          to="/pickups"
-                          className="px-3 py-1 rounded-lg bg-indigo-50 text-indigo-700 font-bold text-[11px] hover:bg-indigo-100"
+                          to="/recipient/pickups"
+                          className="px-3 py-1.5 rounded-xl bg-teal-50 text-teal-800 hover:bg-teal-100 font-bold text-xs flex items-center justify-end gap-1"
                         >
-                          View PIN / Pickup
+                          <Key className="w-3.5 h-3.5 text-teal-600" />
+                          <span>View PIN</span>
                         </Link>
                       ) : (
                         <span className="text-[11px] text-slate-400">

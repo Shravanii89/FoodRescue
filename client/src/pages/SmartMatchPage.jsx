@@ -5,18 +5,14 @@ import { useAuth } from '../context/AuthContext';
 import {
   Sparkles,
   SlidersHorizontal,
-  Compass,
   MapPin,
-  Clock,
-  Utensils,
-  CheckCircle2,
   AlertTriangle,
   ArrowRight,
   TrendingUp,
-  ShieldCheck,
-  Info
 } from 'lucide-react';
 import ExpiryBadge from '../components/ExpiryBadge';
+import PageHeader from '../components/PageHeader';
+import EmptyState from '../components/EmptyState';
 
 const SmartMatchPage = () => {
   const { user } = useAuth();
@@ -60,41 +56,30 @@ const SmartMatchPage = () => {
   }, [desiredQuantity, dietaryType, maxDistanceKm]);
 
   const getScoreColor = (score) => {
-    if (score >= 85) return 'text-emerald-700 bg-emerald-50 border-emerald-300';
+    if (score >= 85) return 'text-forest bg-forest/10 border-forest/30';
     if (score >= 70) return 'text-teal-700 bg-teal-50 border-teal-300';
     if (score >= 50) return 'text-amber-700 bg-amber-50 border-amber-300';
     return 'text-slate-600 bg-slate-100 border-slate-300';
   };
 
   return (
-    <div className="space-y-8">
-      {/* Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950 via-forest to-slate-900 text-white p-6 sm:p-8 shadow-xl">
-        <div className="relative z-10 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-emerald-300 mb-3">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Rule-Based Intelligent Matching Engine</span>
-          </div>
-
-          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Smart Match Compatibility Engine
-          </h1>
-
-          <p className="mt-2 text-xs sm:text-sm text-slate-300 leading-relaxed">
-            Deterministically scores surplus batches (0-100) based on Haversine travel distance,
-            stock-to-capacity fulfillment ratio, and food safety expiry countdown. No guesswork or fake values.
-          </p>
-        </div>
-      </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <PageHeader
+        title="Smart Match Compatibility Engine"
+        subtitle="Rule-based multi-factor optimization prioritizing proximity distance, meal capacity fit, dietary compliance, and food safety urgency."
+        badge="Rule Engine v2.1"
+        badgeVariant="success"
+      />
 
       {/* Recipient Preference Filter Controls */}
-      <div className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+      <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
-            <SlidersHorizontal className="w-4 h-4 text-brand-600" />
+            <SlidersHorizontal className="w-4 h-4 text-forest" />
             <span>Tune Matching Criteria</span>
           </div>
-          <span className="text-[11px] text-slate-400">
+          <span className="text-[11px] text-slate-400 font-medium">
             {recommendations.length} compatible batches ranked
           </span>
         </div>
@@ -109,7 +94,7 @@ const SmartMatchPage = () => {
               min={1}
               value={desiredQuantity}
               onChange={(e) => setDesiredQuantity(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 outline-hidden focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-900 outline-hidden focus:ring-2 focus:ring-forest"
             />
           </div>
 
@@ -120,7 +105,7 @@ const SmartMatchPage = () => {
             <select
               value={dietaryType}
               onChange={(e) => setDietaryType(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 outline-hidden focus:ring-2 focus:ring-brand-500 capitalize"
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 outline-hidden focus:ring-2 focus:ring-forest capitalize"
             >
               <option value="vegetarian">Vegetarian</option>
               <option value="vegan">Vegan Only</option>
@@ -136,7 +121,7 @@ const SmartMatchPage = () => {
             <select
               value={maxDistanceKm}
               onChange={(e) => setMaxDistanceKm(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 outline-hidden focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-800 outline-hidden focus:ring-2 focus:ring-forest"
             >
               <option value="5">Within 5 km (Immediate rescue)</option>
               <option value="15">Within 15 km (Moderate transit)</option>
@@ -148,30 +133,34 @@ const SmartMatchPage = () => {
 
       {/* Ranked Recommendations List */}
       <div className="space-y-4">
-        <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-brand-600" />
-          <span>Ranked Food Match Recommendations</span>
+        <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-forest" />
+          <span>Ranked Compatibility Matches</span>
         </h2>
 
         {loading ? (
           <div className="py-16 text-center">
-            <div className="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-xs text-slate-500">Calculating compatibility scores across active batches...</p>
+            <div className="w-8 h-8 border-4 border-forest border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-xs text-slate-500 font-medium">Calculating compatibility scores across active batches...</p>
           </div>
         ) : recommendations.length === 0 ? (
-          <div className="bg-white rounded-3xl p-10 text-center border border-slate-200/80">
-            <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto mb-2" />
-            <h3 className="text-sm font-bold text-slate-800">No matching surplus found for current criteria</h3>
-            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-              Try extending your proximity distance or reducing the desired quantity threshold.
-            </p>
-          </div>
+          <EmptyState
+            icon={AlertTriangle}
+            title="No matching surplus found for current criteria"
+            description="Try extending your proximity distance or reducing the desired quantity threshold."
+            actionText="Reset Criteria"
+            onAction={() => {
+              setDesiredQuantity(40);
+              setDietaryType('vegetarian');
+              setMaxDistanceKm('30');
+            }}
+          />
         ) : (
           <div className="space-y-4">
-            {recommendations.map((item, index) => (
+            {recommendations.map((item) => (
               <div
                 key={item._id}
-                className="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-xs hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-6"
+                className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-5"
               >
                 {/* Left: Score Badge & Core Info */}
                 <div className="flex items-start gap-4 flex-1">
@@ -199,10 +188,10 @@ const SmartMatchPage = () => {
                     <h3 className="text-base font-bold text-slate-900">{item.title}</h3>
                     <p className="text-xs text-slate-500 line-clamp-1">{item.description}</p>
 
-                    {/* Transparent AI Explanation Box */}
-                    <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-100/90 text-xs text-emerald-950 font-medium">
-                      <span className="font-bold text-emerald-900 block text-[11px] mb-0.5">
-                        💡 Intelligent Compatibility Rationale:
+                    {/* Transparent Explanation Box */}
+                    <div className="p-3 rounded-xl bg-forest/5 border border-forest/15 text-xs text-slate-800 font-medium">
+                      <span className="font-bold text-forest block text-[11px] mb-0.5">
+                        Rule Matching Rationale:
                       </span>
                       {item.matchExplanation}
                     </div>
@@ -230,7 +219,7 @@ const SmartMatchPage = () => {
                 {/* Right Action */}
                 <div className="shrink-0 flex sm:flex-col items-center justify-end gap-2 border-t md:border-t-0 md:border-l border-slate-100 pt-3 md:pt-0 md:pl-6">
                   <div className="text-right hidden sm:block">
-                    <span className="text-base font-extrabold text-brand-700 block">
+                    <span className="text-base font-extrabold text-forest block">
                       {item.remainingQuantity} {item.unit}
                     </span>
                     <span className="text-[10px] text-slate-400">Available to claim</span>
@@ -238,7 +227,7 @@ const SmartMatchPage = () => {
 
                   <Link
                     to={`/listings/${item._id}`}
-                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-1.5"
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-forest hover:bg-forest-light text-white font-bold text-xs shadow-xs transition-colors flex items-center justify-center gap-1.5"
                   >
                     <span>Claim Match</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -252,17 +241,17 @@ const SmartMatchPage = () => {
 
       {/* Demand & Expiry Risk Prediction Section */}
       {predictions && (
-        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-6">
+        <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs space-y-6">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div>
-              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-brand-600" />
+              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-forest" />
                 <span>Demand & Expiry-Risk Prediction Analysis</span>
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">{predictions.notice}</p>
             </div>
-            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-brand-100 text-brand-800">
-              MongoDB Historical Model
+            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-forest/10 text-forest-light">
+              Deterministic Analytics
             </span>
           </div>
 
@@ -276,7 +265,7 @@ const SmartMatchPage = () => {
                 {predictions.categoryDemand?.slice(0, 5).map((cd) => (
                   <div
                     key={cd.category}
-                    className="p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs"
+                    className="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs"
                   >
                     <div>
                       <p className="font-bold text-slate-900 capitalize">
@@ -290,7 +279,7 @@ const SmartMatchPage = () => {
                     <div className="flex items-center gap-3">
                       <div className="w-24 bg-slate-200 rounded-full h-2 overflow-hidden">
                         <div
-                          className="bg-brand-600 h-full rounded-full"
+                          className="bg-forest h-full rounded-full"
                           style={{ width: `${cd.demandScore}%` }}
                         />
                       </div>
@@ -316,14 +305,14 @@ const SmartMatchPage = () => {
               </h3>
               <div className="space-y-2">
                 {predictions.nearExpiryRiskList?.length === 0 ? (
-                  <p className="text-xs text-slate-400 p-4 bg-slate-50 rounded-2xl">
+                  <p className="text-xs text-slate-400 p-4 bg-slate-50 rounded-xl">
                     No active listings currently in critical expiry threshold.
                   </p>
                 ) : (
                   predictions.nearExpiryRiskList?.slice(0, 4).map((ner) => (
                     <div
                       key={ner._id}
-                      className="p-3 rounded-2xl bg-amber-50/60 border border-amber-200/80 text-xs space-y-1"
+                      className="p-3 rounded-xl bg-amber-50/60 border border-amber-200/80 text-xs space-y-1"
                     >
                       <div className="flex items-center justify-between">
                         <p className="font-bold text-slate-900">{ner.title}</p>
@@ -334,7 +323,7 @@ const SmartMatchPage = () => {
                       <p className="text-[11px] text-slate-500">
                         {ner.hoursRemaining}h remaining • {ner.remainingQuantity} {ner.unit}
                       </p>
-                      <p className="text-[10px] text-brand-700 font-medium">
+                      <p className="text-[10px] text-forest font-semibold">
                         Action: {ner.recommendedAction}
                       </p>
                     </div>

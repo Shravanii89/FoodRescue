@@ -4,27 +4,23 @@ import apiClient from '../api/apiClient';
 import { useAuth } from '../context/AuthContext';
 import {
   Search,
-  Filter,
   Compass,
   MapPin,
-  Clock,
   Utensils,
   Sparkles,
-  SlidersHorizontal,
   ArrowRight,
-  CheckCircle2,
-  AlertTriangle
 } from 'lucide-react';
 import ExpiryBadge from '../components/ExpiryBadge';
 import StatusBadge from '../components/StatusBadge';
+import PageHeader from '../components/PageHeader';
+import EmptyState from '../components/EmptyState';
 
 const FoodListingExplorer = () => {
   const { user } = useAuth();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
 
   // Filter States
   const [search, setSearch] = useState(searchParams.get('search') || '');
@@ -52,7 +48,6 @@ const FoodListingExplorer = () => {
       const res = await apiClient.get(`/listings?${params.toString()}`);
       if (res.data?.success) {
         setListings(res.data.data || []);
-        setPagination(res.data.pagination || { page: 1, pages: 1, total: 0 });
       }
     } catch (err) {
       console.error('Failed to load listings:', err);
@@ -80,28 +75,24 @@ const FoodListingExplorer = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
-            <Compass className="w-6 h-6 text-brand-600" />
-            <span>Surplus Food Explorer</span>
-          </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Discover verified surplus batches filtered by category, distance, and expiry window
-          </p>
-        </div>
-
-        <Link
-          to="/smart-match"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-gradient-to-r from-brand-600 to-emerald-700 text-white font-bold text-xs shadow-md shadow-brand-600/20 hover:scale-105 transition-all"
-        >
-          <Sparkles className="w-4 h-4 text-emerald-200" />
-          <span>Try Smart Match Engine</span>
-        </Link>
-      </div>
+      <PageHeader
+        title="Surplus Food Explorer"
+        subtitle="Discover verified surplus batches filtered by category, quantity, distance, and expiry window."
+        badge="Live Network"
+        badgeVariant="success"
+        action={
+          <Link
+            to="/smart-match"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-forest hover:bg-forest-light text-white font-bold text-xs shadow-xs transition-colors"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+            <span>Smart Match Engine</span>
+          </Link>
+        }
+      />
 
       {/* Filter Toolbar */}
-      <div className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs space-y-4">
+      <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs space-y-4">
         {/* Search Bar */}
         <div className="relative">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
@@ -110,7 +101,7 @@ const FoodListingExplorer = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by meal name, ingredient, or neighborhood..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-500 outline-hidden bg-slate-50/50 focus:bg-white transition-all font-medium"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-forest outline-hidden bg-slate-50/50 focus:bg-white transition-all font-medium text-slate-900"
           />
         </div>
 
@@ -122,7 +113,7 @@ const FoodListingExplorer = () => {
               onClick={() => setCategory(c.value)}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
                 category === c.value
-                  ? 'bg-brand-600 text-white shadow-xs'
+                  ? 'bg-forest text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -140,7 +131,7 @@ const FoodListingExplorer = () => {
             <select
               value={dietaryType}
               onChange={(e) => setDietaryType(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-white text-slate-700 outline-hidden focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-700 outline-hidden focus:ring-2 focus:ring-forest"
             >
               <option value="">Any Dietary</option>
               <option value="vegetarian">Vegetarian Only</option>
@@ -160,7 +151,7 @@ const FoodListingExplorer = () => {
               placeholder="e.g. 25"
               value={minQuantity}
               onChange={(e) => setMinQuantity(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-white text-slate-700 outline-hidden focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-700 outline-hidden focus:ring-2 focus:ring-forest"
             />
           </div>
 
@@ -171,7 +162,7 @@ const FoodListingExplorer = () => {
             <select
               value={maxDistanceKm}
               onChange={(e) => setMaxDistanceKm(e.target.value)}
-              className="w-full px-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-white text-slate-700 outline-hidden focus:ring-2 focus:ring-brand-500"
+              className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-700 outline-hidden focus:ring-2 focus:ring-forest"
             >
               <option value="">Any Distance</option>
               <option value="3">Within 3 km</option>
@@ -186,35 +177,29 @@ const FoodListingExplorer = () => {
       {/* Listings Grid */}
       {loading ? (
         <div className="py-20 text-center">
-          <div className="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-xs text-slate-500">Querying surplus food records...</p>
+          <div className="w-8 h-8 border-4 border-forest border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-xs text-slate-500 font-medium">Querying surplus food records...</p>
         </div>
       ) : listings.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/80">
-          <Utensils className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h2 className="text-sm font-bold text-slate-800">No surplus food batches match your criteria</h2>
-          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-            Try adjusting your search filters or resetting distance limits to view more donations.
-          </p>
-          <button
-            onClick={() => {
-              setSearch('');
-              setCategory('');
-              setDietaryType('');
-              setMinQuantity('');
-              setMaxDistanceKm('');
-            }}
-            className="mt-4 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-700 transition-colors"
-          >
-            Clear All Filters
-          </button>
-        </div>
+        <EmptyState
+          icon={Utensils}
+          title="No surplus food batches match your criteria"
+          description="Try adjusting your search filters or resetting distance limits to view more donations."
+          actionText="Clear All Filters"
+          onAction={() => {
+            setSearch('');
+            setCategory('');
+            setDietaryType('');
+            setMinQuantity('');
+            setMaxDistanceKm('');
+          }}
+        />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {listings.map((item) => (
             <div
               key={item._id}
-              className="bg-white rounded-3xl border border-slate-200/80 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
+              className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
             >
               <div>
                 {/* Header Tags */}
@@ -226,7 +211,7 @@ const FoodListingExplorer = () => {
                 </div>
 
                 {/* Title & Description */}
-                <h3 className="text-base font-bold text-slate-900 group-hover:text-brand-700 transition-colors line-clamp-1">
+                <h3 className="text-base font-bold text-slate-900 group-hover:text-forest transition-colors line-clamp-1">
                   {item.title}
                 </h3>
                 <p className="mt-1 text-xs text-slate-500 line-clamp-2 leading-relaxed">
@@ -237,7 +222,7 @@ const FoodListingExplorer = () => {
                 <div className="mt-4 pt-3 border-t border-slate-100 space-y-2 text-xs text-slate-600">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-400">Available Stock:</span>
-                    <span className="font-extrabold text-brand-700">
+                    <span className="font-extrabold text-forest">
                       {item.remainingQuantity} <span className="text-slate-500 font-normal">/ {item.quantity} {item.unit}</span>
                     </span>
                   </div>
@@ -272,7 +257,7 @@ const FoodListingExplorer = () => {
 
                 <Link
                   to={`/listings/${item._id}`}
-                  className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-forest hover:bg-forest-light text-white font-bold text-xs shadow-xs transition-colors flex items-center gap-1.5"
                 >
                   <span>Claim / Details</span>
                   <ArrowRight className="w-3.5 h-3.5" />

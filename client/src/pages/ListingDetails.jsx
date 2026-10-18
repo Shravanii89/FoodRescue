@@ -14,8 +14,7 @@ import {
   HeartHandshake,
   CheckCircle2,
   AlertCircle,
-  Truck,
-  Sparkles
+  Truck
 } from 'lucide-react';
 import ExpiryBadge from '../components/ExpiryBadge';
 import StatusBadge from '../components/StatusBadge';
@@ -105,8 +104,8 @@ const ListingDetails = () => {
   if (loading) {
     return (
       <div className="py-20 text-center">
-        <div className="w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-        <p className="text-xs text-slate-500">Loading food donation details...</p>
+        <div className="w-8 h-8 border-4 border-forest border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-xs text-slate-500 font-medium">Loading food donation details...</p>
       </div>
     );
   }
@@ -119,7 +118,7 @@ const ListingDetails = () => {
         <p className="text-xs text-slate-500 mt-1">{error || 'This listing does not exist.'}</p>
         <Link
           to="/explore"
-          className="mt-4 inline-block px-4 py-2 rounded-xl bg-brand-600 text-white font-bold text-xs"
+          className="mt-4 inline-block px-4 py-2 rounded-xl bg-forest text-white font-bold text-xs"
         >
           Back to Explorer
         </Link>
@@ -150,10 +149,10 @@ const ListingDetails = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Left Column: Food Listing Specification */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
+          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-brand-50 text-brand-800 border border-brand-100">
+                <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-forest/10 text-forest-light border border-forest/20">
                   {listing.category?.replace('_', ' ')}
                 </span>
                 <span className="px-3 py-1 rounded-full text-xs font-semibold capitalize bg-slate-100 text-slate-700">
@@ -164,17 +163,17 @@ const ListingDetails = () => {
             </div>
 
             <div>
-              <h2 className="text-lg font-bold text-slate-900">Food Description</h2>
+              <h2 className="text-base font-bold text-slate-900">Food Description</h2>
               <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
                 {listing.description || 'Freshly prepared edible surplus food ready for humanitarian distribution.'}
               </p>
             </div>
 
             {/* Inventory & Timing Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 p-4 rounded-2xl bg-slate-50/80 border border-slate-100 text-xs">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 p-4 rounded-xl bg-slate-50/80 border border-slate-100 text-xs">
               <div>
                 <span className="text-slate-400 block text-[10px] uppercase font-bold">Remaining Stock</span>
-                <span className="text-base font-extrabold text-brand-700">
+                <span className="text-base font-extrabold text-forest">
                   {listing.remainingQuantity} {listing.unit}
                 </span>
               </div>
@@ -209,7 +208,7 @@ const ListingDetails = () => {
             </div>
 
             {/* Storage & Refrigeration */}
-            <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100 text-xs text-slate-700 space-y-1.5">
+            <div className="p-4 rounded-xl bg-emerald-50/60 border border-emerald-100 text-xs text-slate-700 space-y-1.5">
               <p className="font-bold text-emerald-900 flex items-center gap-1.5">
                 <ThermometerSnowflake className="w-4 h-4 text-emerald-700" />
                 <span>Storage & Logistics Protocol</span>
@@ -228,7 +227,7 @@ const ListingDetails = () => {
                 Donor Organization Details
               </h3>
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-brand-100 text-brand-700 font-bold flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-forest/10 text-forest font-bold flex items-center justify-center shrink-0">
                   <Building2 className="w-5 h-5" />
                 </div>
                 <div className="text-xs">
@@ -256,49 +255,63 @@ const ListingDetails = () => {
 
         {/* Right Column: Claim Action Form */}
         <div className="space-y-4">
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-card">
+          <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs">
             <div className="flex items-center gap-2 mb-4">
-              <div className="p-2 rounded-xl bg-brand-50 text-brand-600">
+              <div className="p-2 rounded-xl bg-forest/10 text-forest">
                 <HeartHandshake className="w-5 h-5" />
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-sm">Request Food Claim</h3>
-                <p className="text-[11px] text-slate-500">Atomic stock reservation for verified NGOs</p>
+                <p className="text-[11px] text-slate-500">Stock reservation for verified NGOs</p>
               </div>
             </div>
 
             {claimSuccess ? (
-              <div className="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-3 animate-fadeIn">
+              <div className="p-5 rounded-xl bg-emerald-50 border border-emerald-200 text-center space-y-3">
                 <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto" />
                 <h4 className="font-bold text-slate-900 text-sm">Claim Request Submitted!</h4>
                 <p className="text-xs text-slate-600">
                   Your request has been routed to the donor for approval. The requested stock is temporarily reserved.
                 </p>
                 <Link
-                  to="/requests"
-                  className="block w-full py-2 px-3 rounded-xl bg-brand-600 text-white font-bold text-xs shadow-xs"
+                  to="/recipient/requests"
+                  className="block w-full py-2 px-3 rounded-xl bg-forest hover:bg-forest-light text-white font-bold text-xs shadow-xs transition-colors"
                 >
                   Track in My Requests
                 </Link>
               </div>
             ) : !isAvailable || isExpired ? (
-              <div className="p-4 rounded-2xl bg-slate-100 text-center text-xs text-slate-500">
+              <div className="p-4 rounded-xl bg-slate-100 text-center text-xs text-slate-500">
                 <Clock className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                 <p className="font-bold text-slate-700">Not Available for Claim</p>
                 <p className="mt-1">This surplus batch has expired or has already been completely claimed.</p>
               </div>
             ) : isDonorOwner ? (
-              <div className="p-4 rounded-2xl bg-slate-50 text-center text-xs text-slate-600">
+              <div className="p-4 rounded-xl bg-slate-50 text-center text-xs text-slate-600">
                 <p className="font-semibold">You are the donor of this batch.</p>
                 <Link
                   to={`/listings/edit/${listing._id}`}
-                  className="inline-block mt-3 px-4 py-1.5 rounded-xl bg-slate-200 text-slate-800 font-bold text-xs"
+                  className="inline-block mt-3 px-4 py-2 rounded-xl bg-forest text-white font-bold text-xs hover:bg-forest-light transition-colors"
                 >
                   Edit Listing
                 </Link>
               </div>
+            ) : user && user.role === 'donor' ? (
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-2 text-center">
+                <Utensils className="w-6 h-6 text-forest mx-auto" />
+                <p className="font-bold text-slate-900">Donor Account Active</p>
+                <p className="text-[11px] text-slate-500">
+                  You are currently logged in as a Food Donor. Food rescue claims can only be submitted by registered Recipient NGOs and Charity Shelters.
+                </p>
+                <Link
+                  to="/donor/dashboard"
+                  className="inline-block mt-2 px-3 py-1.5 rounded-xl bg-forest text-white font-bold text-xs hover:bg-forest-light transition-colors"
+                >
+                  Go to Donor Dashboard
+                </Link>
+              </div>
             ) : user && user.role === 'recipient' && user.verificationStatus !== 'verified' ? (
-              <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-2">
+              <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-2">
                 <p className="font-bold flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-amber-600" />
                   <span>Account Pending Verification</span>
@@ -324,7 +337,7 @@ const ListingDetails = () => {
                       setRequestedQuantity(val);
                       setPeopleToFeed(val);
                     }}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-500 outline-hidden font-bold text-slate-900"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-forest outline-hidden font-bold text-slate-900"
                   />
                   <span className="text-[10px] text-slate-400 mt-0.5 block">
                     Max claimable: {listing.remainingQuantity} {listing.unit}
@@ -342,7 +355,7 @@ const ListingDetails = () => {
                     value={peopleToFeed}
                     onChange={(e) => setPeopleToFeed(e.target.value)}
                     placeholder="e.g. 35"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-500 outline-hidden"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-forest outline-hidden"
                   />
                 </div>
 
@@ -355,24 +368,24 @@ const ListingDetails = () => {
                     required
                     value={proposedTime}
                     onChange={(e) => setProposedTime(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-brand-500 outline-hidden"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-forest outline-hidden"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Transport Vehicle
+                    Transit Vehicle Type
                   </label>
                   <select
                     value={vehicleType}
                     onChange={(e) => setVehicleType(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white capitalize outline-hidden focus:ring-2 focus:ring-brand-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs bg-white text-slate-700 outline-hidden focus:ring-2 focus:ring-forest capitalize"
                   >
-                    <option value="van">Van / Small Truck</option>
-                    <option value="car">Car / SUV</option>
-                    <option value="auto">Auto Rickshaw</option>
-                    <option value="bike">Two Wheeler with carrier</option>
-                    <option value="on_foot">On Foot / Hand Cart</option>
+                    <option value="van">Refrigerated / Insulated Van</option>
+                    <option value="car">Volunteer Car / Trunk</option>
+                    <option value="motorcycle">Insulated Cargo Bike</option>
+                    <option value="truck">Large Cargo Truck</option>
+                    <option value="other">On-Foot Immediate Carrier</option>
                   </select>
                 </div>
 
@@ -384,24 +397,24 @@ const ListingDetails = () => {
                     rows={2}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder="e.g. Arriving with insulated food-grade containers."
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs outline-hidden focus:ring-2 focus:ring-brand-500"
+                    placeholder="Provide dietary handling notes or pickup instructions..."
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-forest outline-hidden"
                   />
                 </div>
+
+                {error && (
+                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
+                    {error}
+                  </div>
+                )}
 
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full py-2.5 px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md shadow-brand-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full py-2.5 rounded-xl bg-forest hover:bg-forest-light text-white font-bold text-xs shadow-xs transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
                 >
-                  {submitting ? (
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <>
-                      <HeartHandshake className="w-4 h-4" />
-                      <span>Submit Claim Request</span>
-                    </>
-                  )}
+                  <Truck className="w-4 h-4" />
+                  <span>{submitting ? 'Reserving Batch...' : 'Submit Claim Request'}</span>
                 </button>
               </form>
             )}
