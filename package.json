@@ -4,10 +4,21 @@
   "description": "FoodRescue - Smart Surplus Food Redistribution & Donation Management System",
   "scripts": {
     "install:all": "npm install --prefix server && npm install --prefix client",
+    "start": "npm start --prefix server",
+    "dev": "npm run dev --prefix client",
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
+    "build": "npm run build --prefix client",
     "seed": "npm run seed --prefix server",
-    "test": "npm run test --prefix server"
+    "test": "npm run test --prefix server",
+    "test:db": "npm run test:db --prefix server"
   },
-  "keywords": ["food-rescue", "donation", "mongodb", "react", "express", "smart-match"]
+  "keywords": [
+    "food-rescue",
+    "donation",
+    "mongodb",
+    "react",
+    "express",
+    "smart-match"
+  ]
 }
