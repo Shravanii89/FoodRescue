@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'test';
 import { connectDB } from '../config/db.js';
 import User from '../models/User.js';
 import FoodListing from '../models/FoodListing.js';
@@ -8,8 +9,20 @@ import { seedDatabase } from '../scripts/seed.js';
 const runE2EJourney = async () => {
   console.log('🚀 Running FoodRescue End-to-End Live Workflow Verification...\n');
   const baseUrl = 'http://localhost:5000/api';
+  let spawnedServer = null;
 
   try {
+    // Ensure server is up
+    try {
+      const probe = await fetch(`${baseUrl}/health`, { signal: AbortSignal.timeout(1000) });
+      if (!probe.ok) throw new Error('Not ready');
+    } catch {
+      console.log('ℹ️ Server is not running on port 5000. Starting server for end-to-end verification...');
+      const { startServer } = await import('../index.js');
+      spawnedServer = await startServer();
+      await new Promise((resolve) => setTimeout(resolve, 800));
+    }
+
     // Step 1: Donor Login
     console.log('Step 1: Authenticating as Donor (The Grand Orchid)...');
     const donorLoginRes = await fetch(`${baseUrl}/auth/login`, {
@@ -151,8 +164,15 @@ const runE2EJourney = async () => {
     console.log('\n======================================================');
     console.log('🎉 ALL LIVE END-TO-END FLOWS PASSED FLAWLESSLY!');
     console.log('======================================================\n');
+    if (spawnedServer) {
+      spawnedServer.close();
+    }
+    process.exit(0);
   } catch (err) {
     console.error('❌ E2E Journey Failed:', err.message);
+    if (spawnedServer) {
+      spawnedServer.close();
+    }
     process.exit(1);
   }
 };
